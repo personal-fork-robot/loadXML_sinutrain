@@ -1,0 +1,162 @@
+clc
+clear 
+
+%%
+load_xml
+
+time = plot_data(:, 1);
+dt = time(2) - time(1); % 插补周期
+
+%% 笛卡尔空间
+xx = plot_data(:, 2);
+yy = plot_data(:, 3);
+zz = plot_data(:, 4);
+
+AA = plot_data(:, 5);
+BB = plot_data(:, 6);
+CC = plot_data(:, 7);
+
+feedrate = zeros(length(xx), 1);
+acc = zeros(length(xx), 1);
+jerk = zeros(length(xx), 1);
+feedrate(1) = 0.0;
+acc(1) = 0.0;
+for i = 2: length(xx)
+    feedrate(i) = norm([xx(i)-xx(i-1), yy(i)-yy(i-1), zz(i)-zz(i-1)]) / dt;
+end
+for i = 2: length(feedrate)
+    acc(i) = (feedrate(i) - feedrate(i-1)) / dt;
+end
+for i = 2: length(acc)
+    jerk(i) = (acc(i) - acc(i-1)) / dt;
+end
+jerk(1) = jerk(2); % 这里默认第一个点的jerk和第二个点的jerk值相同
+
+%% 关节空间
+j1 = plot_data(:, 8);
+j2 = plot_data(:, 9);
+j3 = plot_data(:, 10);
+j4 = plot_data(:, 11);
+j5 = plot_data(:, 12);
+j6 = plot_data(:, 13);
+
+% j1
+j1_vel = zeros(length(j1), 1);
+j1_acc = zeros(length(j1), 1);
+j1_jerk = zeros(length(j1), 1);
+j1_vel(1) = 0.0;
+j1_acc(1) = 0.0;
+
+j1_vel(2: end) = diff(j1) / dt;
+j1_acc(2: end) = diff(j1_vel) / dt;
+j1_jerk(2: end) = diff(j1_acc) / dt;
+j1_jerk(1) = j1_jerk(2); % 这里默认第一个点的jerk和第二个点的jerk值相同
+
+% j2
+j2_vel = zeros(length(j2), 1);
+j2_acc = zeros(length(j2), 1);
+j2_jerk = zeros(length(j2), 1);
+j2_vel(1) = 0.0;
+j2_acc(1) = 0.0;
+
+j2_vel(2: end) = diff(j2) / dt;
+j2_acc(2: end) = diff(j2_vel) / dt;
+j2_jerk(2: end) = diff(j2_acc) / dt;
+j2_jerk(1) = j2_jerk(2); % 这里默认第一个点的jerk和第二个点的jerk值相同
+
+% j3
+j3_vel = zeros(length(j3), 1);
+j3_acc = zeros(length(j3), 1);
+j3_jerk = zeros(length(j3), 1);
+j3_vel(1) = 0.0;
+j3_acc(1) = 0.0;
+
+j3_vel(2: end) = diff(j3) / dt;
+j3_acc(2: end) = diff(j3_vel) / dt;
+j3_jerk(2: end) = diff(j3_acc) / dt;
+j3_jerk(1) = j3_jerk(2); % 这里默认第一个点的jerk和第二个点的jerk值相同
+
+% j4
+j4_vel = zeros(length(j4), 1);
+j4_acc = zeros(length(j4), 1);
+j4_jerk = zeros(length(j4), 1);
+j4_vel(1) = 0.0;
+j4_acc(1) = 0.0;
+
+j4_vel(2: end) = diff(j4) / dt;
+j4_acc(2: end) = diff(j4_vel) / dt;
+j4_jerk(2: end) = diff(j4_acc) / dt;
+j4_jerk(1) = j4_jerk(2); % 这里默认第一个点的jerk和第二个点的jerk值相同
+
+% j5
+j5_vel = zeros(length(j5), 1);
+j5_acc = zeros(length(j5), 1);
+j5_jerk = zeros(length(j5), 1);
+j5_vel(1) = 0.0;
+j5_acc(1) = 0.0;
+
+j5_vel(2: end) = diff(j5) / dt;
+j5_acc(2: end) = diff(j5_vel) / dt;
+j5_jerk(2: end) = diff(j5_acc) / dt;
+j5_jerk(1) = j5_jerk(2); % 这里默认第一个点的jerk和第二个点的jerk值相同
+
+% j6
+j6_vel = zeros(length(j6), 1);
+j6_acc = zeros(length(j6), 1);
+j6_jerk = zeros(length(j6), 1);
+j6_vel(1) = 0.0;
+j6_acc(1) = 0.0;
+
+j6_vel(2: end) = diff(j6) / dt;
+j6_acc(2: end) = diff(j6_vel) / dt;
+j6_jerk(2: end) = diff(j6_acc) / dt;
+j6_jerk(1) = j6_jerk(2); % 这里默认第一个点的jerk和第二个点的jerk值相同
+
+figure
+grid on
+plot3(xx, yy, zz, 'ro')
+
+figure
+grid on
+plot(time, j1, time, j2, time, j3, time, j4, time, j5, time, j6)
+xlabel('time (s)')
+ylabel('joint position (degree)')
+title('Joint position')
+legend('j1', 'j2', 'j3', 'j4', 'j5', 'j6')
+
+figure
+plot(time, j1_vel, time, j2_vel, time, j3_vel, time, j4_vel, time, j5_vel, time, j6_vel)
+xlabel('time (s)')
+ylabel('joint velocity (degree/s)')
+title('Joint velocity')
+legend('j1-vel', 'j2-vel', 'j3-vel', 'j4-vel', 'j5-vel', 'j6-vel')
+grid on
+
+figure
+plot(time, j1_acc, time, j2_acc, time, j3_acc, time, j4_acc, time, j5_acc, time, j6_acc)
+xlabel('time (s)')
+ylabel('joint acceleration (degree/s2)')
+title('Joint acceleration')
+legend('j1-acc', 'j2-acc', 'j3-acc', 'j4-acc', 'j5-acc', 'j6-acc')
+
+figure
+grid on
+plot(time, j1_jerk, time, j2_jerk, time, j3_jerk, time, j4_jerk, time, j5_jerk, time, j6_jerk)
+xlabel('time (s)')
+ylabel('joint jerk (degree/s3)')
+title('Joint jerk')
+legend('j1-jerk', 'j2-jerk', 'j3-jerk', 'j4-jerk', 'j5-jerk', 'j6-jerk')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
